@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/GuriSingh68/rssagg/handlers"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
@@ -29,6 +30,12 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
+	//Hooking up the routes
+	v1Router := chi.NewRouter()
+	router.Mount("/v1", v1Router)                       // Mount the v1 router to the main router the request will be like /v1/ready
+	v1Router.Get("/error", handlers.ErrorHandler)       // Error handler endpoint
+	v1Router.Get("/healthz", handlers.ReadinessHandler) // Health check endpoint
+
 	srv := &http.Server{
 		Handler: router,
 		Addr:    fmt.Sprintf(":%s", portString),
